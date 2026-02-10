@@ -31,6 +31,7 @@ export interface Database {
           description: string | null;
           image: string | null;
           author: string;
+          endangered: boolean;
         };
         Insert: {
           id?: number;
@@ -41,6 +42,7 @@ export interface Database {
           description?: string | null;
           image?: string | null;
           author: string;
+          endangered?: boolean;
         };
         Update: {
           id?: number;
@@ -51,6 +53,7 @@ export interface Database {
           description?: string | null;
           image?: string | null;
           author?: string;
+          endangered?: boolean;
         };
       };
     };

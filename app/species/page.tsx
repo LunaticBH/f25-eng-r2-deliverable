@@ -22,6 +22,16 @@ export default async function SpeciesList() {
 
   const { data: species } = await supabase.from("species").select("*").order("id", { ascending: false });
 
+  // Fetch author profiles for each species
+  const authorIds = species?.map((s) => s.author) ?? [];
+  const { data: profiles } = await supabase
+    .from("profiles")
+    .select("*")
+    .in("id", authorIds);
+
+  // Create a map of author IDs to profiles for easy lookup
+  const profileMap = new Map(profiles?.map((p) => [p.id, p]) ?? []);
+
   return (
     <>
       <div className="mb-5 flex flex-wrap items-center justify-between gap-4">
@@ -30,7 +40,9 @@ export default async function SpeciesList() {
       </div>
       <Separator className="my-4" />
       <div className="flex flex-wrap justify-center">
-        {species?.map((s) => <SpeciesCard key={s.id} species={s} userId={sessionId} />)}
+        {species?.map((s) => (
+          <SpeciesCard key={s.id} species={s} userId={sessionId} authorProfile={profileMap.get(s.author)} />
+        ))}
       </div>
     </>
   );

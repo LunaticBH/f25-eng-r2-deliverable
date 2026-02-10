@@ -12,12 +12,14 @@ can cause errors with matching props and state in child components if the list o
 */
 import type { Database } from "@/lib/schema";
 import Image from "next/image";
+import DeleteSpeciesDialog from "./delete-species-dialog";
 import EditSpeciesDialog from "./edit-species-dialog";
 import SpeciesDetailDialog from "./species-detail-dialog";
 
 type Species = Database["public"]["Tables"]["species"]["Row"];
+type Profile = Database["public"]["Tables"]["profiles"]["Row"];
 
-export default function SpeciesCard({ species, userId }: { species: Species; userId: string }) {
+export default function SpeciesCard({ species, userId, authorProfile }: { species: Species; userId: string; authorProfile?: Profile }) {
   const isAuthor = species.author === userId;
 
   return (
@@ -30,9 +32,14 @@ export default function SpeciesCard({ species, userId }: { species: Species; use
       <h3 className="mt-3 text-2xl font-semibold">{species.scientific_name}</h3>
       <h4 className="text-lg font-light italic">{species.common_name}</h4>
       <p>{species.description ? species.description.slice(0, 150).trim() + "..." : ""}</p>
-      <div className="mt-3 flex gap-2">
-        <SpeciesDetailDialog species={species} />
-        {isAuthor && <EditSpeciesDialog species={species} />}
+      <div className="mt-3 flex flex-col gap-2">
+        <SpeciesDetailDialog species={species} authorProfile={authorProfile} />
+        {isAuthor && (
+          <div className="flex gap-2">
+            <EditSpeciesDialog species={species} />
+            <DeleteSpeciesDialog species={species} />
+          </div>
+        )}
       </div>
     </div>
   );

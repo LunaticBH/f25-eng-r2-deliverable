@@ -13,8 +13,9 @@ import type { Database } from "@/lib/schema";
 import { useState } from "react";
 
 type Species = Database["public"]["Tables"]["species"]["Row"];
+type Profile = Database["public"]["Tables"]["profiles"]["Row"];
 
-export default function SpeciesDetailDialog({ species }: { species: Species }) {
+export default function SpeciesDetailDialog({ species, authorProfile }: { species: Species; authorProfile?: Profile }) {
   const [open, setOpen] = useState<boolean>(false);
 
   return (
@@ -47,9 +48,20 @@ export default function SpeciesDetailDialog({ species }: { species: Species }) {
             </p>
           </div>
           <div>
+            <h3 className="font-semibold">Endangered Status</h3>
+            <p className="text-sm text-gray-600">{species.endangered ? "Yes, endangered" : "Not endangered"}</p>
+          </div>
+          <div>
             <h3 className="font-semibold">Description</h3>
             <p className="text-sm text-gray-600">{species.description ?? "No description available"}</p>
           </div>
+          {authorProfile && (
+            <div>
+              <h3 className="font-semibold">Added by</h3>
+              <p className="text-sm text-gray-600">{authorProfile.display_name}</p>
+              <p className="text-xs text-gray-500">{authorProfile.email}</p>
+            </div>
+          )}
         </div>
       </DialogContent>
     </Dialog>

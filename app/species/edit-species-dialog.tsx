@@ -2,6 +2,7 @@
 
 import { Icons } from "@/components/icons";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Dialog,
   DialogClose,
@@ -51,6 +52,7 @@ const speciesSchema = z.object({
     .string()
     .nullable()
     .transform((val) => (!val || val.trim() === "" ? null : val.trim())),
+  endangered: z.boolean(),
 });
 
 type FormData = z.infer<typeof speciesSchema>;
@@ -69,6 +71,7 @@ export default function EditSpeciesDialog({ species }: { species: Species }) {
     total_population: species.total_population,
     image: species.image,
     description: species.description,
+    endangered: species.endangered,
   };
 
   // Instantiate form functionality with React Hook Form, passing in the Zod schema (for validation) and default values
@@ -90,6 +93,7 @@ export default function EditSpeciesDialog({ species }: { species: Species }) {
         scientific_name: input.scientific_name,
         total_population: input.total_population,
         image: input.image,
+        endangered: input.endangered,
       })
       .eq("id", species.id);
 
@@ -249,6 +253,19 @@ export default function EditSpeciesDialog({ species }: { species: Species }) {
                     </FormItem>
                   );
                 }}
+              />
+              <FormField
+                control={form.control}
+                name="endangered"
+                render={({ field }) => (
+                  <FormItem className="flex flex-row items-center space-x-3 space-y-0">
+                    <FormControl>
+                      <Checkbox checked={field.value} onCheckedChange={field.onChange} />
+                    </FormControl>
+                    <FormLabel className="font-normal">This species is endangered</FormLabel>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
               <div className="flex">
                 <Button type="submit" className="ml-1 mr-1 flex-auto">
