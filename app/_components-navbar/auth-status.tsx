@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { createServerSupabaseClient } from "@/lib/server-utils";
+import type { Database } from "@/lib/schema";
 import Link from "next/link";
 import UserNav from "./user-nav";
 
@@ -18,13 +19,20 @@ export default async function AuthStatus() {
     );
   }
 
-  const { data, error } = await supabase.from("profiles").select().eq("id", user.id);
+  const { data, error } = (await supabase
+    .from("profiles")
+    .select()
+    .eq("id", user.id)) as {
+    data: Database["public"]["Tables"]["profiles"]["Row"][] | null;
+    error: { message: string } | null;
+  };
 
-  if (error ?? data.length !== 1) {
+  if (error !== null || !data || data.length !== 1) {
     return;
   }
 
-  const profileData = data[0];
+  const profileData: Database["public"]["Tables"]["profiles"]["Row"] =
+    data[0]!;
 
   // Note: We normally wouldn't need to check this case, but because ts noUncheckedIndexedAccess is enabled in tsconfig, we have to.
   // noUncheckedIndexedAccess provides better typesafety at cost of jumping through occasional hoops.

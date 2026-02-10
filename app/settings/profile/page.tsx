@@ -1,5 +1,6 @@
 import { Separator } from "@/components/ui/separator";
 import { createServerSupabaseClient } from "@/lib/server-utils";
+import type { Database } from "@/lib/schema";
 import { redirect } from "next/navigation";
 import ProfileForm from "./profile-form";
 
@@ -23,17 +24,26 @@ export default async function Settings() {
     redirect("/");
   }
 
-  const { data, error } = await supabase.from("profiles").select().eq("id", session.user.id);
+  const { data, error } = (await supabase
+    .from("profiles")
+    .select()
+    .eq("id", session.user.id)) as {
+    data: Database["public"]["Tables"]["profiles"]["Row"][] | null;
+    error: { message: string } | null;
+  };
 
   if (error) {
     return <SettingsError message={error.message} />;
   }
 
-  if (data.length !== 1) {
-    return <SettingsError message="There are duplicate UUIDs. Please contact system administrator" />;
+  if (!data || data.length !== 1) {
+    return (
+      <SettingsError message="There are duplicate UUIDs. Please contact system administrator" />
+    );
   }
 
-  const profileData = data[0];
+  const profileData: Database["public"]["Tables"]["profiles"]["Row"] =
+    data[0]!;
 
   // Note: We normally wouldn't need to check this case, but because ts noUncheckedIndexedAccess is enabled in tsconfig, we have to.
   // noUncheckedIndexedAccess provides better typesafety at cost of jumping through occasional hoops.

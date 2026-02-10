@@ -1,6 +1,7 @@
 import { Separator } from "@/components/ui/separator";
 import { TypographyH2 } from "@/components/ui/typography";
 import { createServerSupabaseClient } from "@/lib/server-utils";
+import type { Database } from "@/lib/schema";
 import { redirect } from "next/navigation";
 import AddSpeciesDialog from "./add-species-dialog";
 import SpeciesCard from "./species-card";
@@ -20,17 +21,28 @@ export default async function SpeciesList() {
   // Obtain the ID of the currently signed-in user
   const sessionId = session.user.id;
 
-  const { data: species } = await supabase.from("species").select("*").order("id", { ascending: false });
+  const { data: species } = (await supabase
+    .from("species")
+    .select("*")
+    .order("id", { ascending: false })) as {
+    data: Database["public"]["Tables"]["species"]["Row"][] | null;
+    error: { message: string } | null;
+  };
 
   // Fetch author profiles for each species
   const authorIds = species?.map((s) => s.author) ?? [];
-  const { data: profiles } = await supabase
+  const { data: profiles } = (await supabase
     .from("profiles")
     .select("*")
-    .in("id", authorIds);
+    .in("id", authorIds)) as {
+    data: Database["public"]["Tables"]["profiles"]["Row"][] | null;
+    error: { message: string } | null;
+  };
 
   // Create a map of author IDs to profiles for easy lookup
-  const profileMap = new Map(profiles?.map((p) => [p.id, p]) ?? []);
+  const profileMap = new Map(
+    profiles?.map((p) => [p.id, p]) ?? []
+  );
 
   return (
     <>
