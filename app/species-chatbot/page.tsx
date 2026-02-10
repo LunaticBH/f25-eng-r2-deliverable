@@ -56,14 +56,20 @@ export default function SpeciesChatbot() {
       });
 
       if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || "Failed to get response");
+        const errorData = await response.json() as unknown;
+        const errorMessage = typeof (errorData as { error?: unknown }).error === "string"
+          ? (errorData as { error: string }).error
+          : "Failed to get response";
+        throw new Error(errorMessage);
       }
 
-      const data = await response.json();
+      const data = await response.json() as unknown;
+      const responseContent = typeof (data as { response?: unknown }).response === "string"
+        ? (data as { response: string }).response
+        : "No response";
 
       // Add bot response to chat log
-      setChatLog([...newChatLog, { role: "bot", content: data.response }]);
+      setChatLog([...newChatLog, { role: "bot", content: responseContent }]);
     } catch (error) {
       console.error("Error:", error);
       // Add error message to chat log

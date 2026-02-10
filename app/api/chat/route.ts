@@ -4,17 +4,17 @@ import { generateResponse } from "@/lib/services/species-chat";
 export async function POST(request: Request) {
   try {
     // Parse the request body
-    const body = await request.json();
+    const body = await request.json() as unknown;
 
     // Validate input
-    if (!body || typeof body.message !== "string") {
+    if (!body || typeof (body as { message?: unknown }).message !== "string") {
       return new Response(JSON.stringify({ error: "Invalid or missing body" }), {
         status: 400,
         headers: { "Content-Type": "application/json" },
       });
     }
 
-    const message = body.message.trim();
+    const message = ((body as { message: string }).message).trim();
 
     // Check if message is empty after trimming
     if (!message) {
