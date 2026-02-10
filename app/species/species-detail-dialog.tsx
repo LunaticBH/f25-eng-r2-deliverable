@@ -20,7 +20,7 @@ export default function SpeciesDetailDialog({ species }: { species: Species }) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button className="mt-3 w-full">Learn More</Button>
+        <Button className="w-full">Learn More</Button>
       </DialogTrigger>
       <DialogContent className="max-h-screen overflow-y-auto sm:max-w-[600px]">
         <DialogHeader>
